@@ -1,9 +1,9 @@
 {
 	"name": "rouge-engineer",
 	"version": "0.0.1",
-	"title": "Rouge Engineer",
+	"title": "Rogue Engineer",
 	"author": "@been-jamming github",
-	"description": "Changes factorio into a rouge-like.",
+	"description": "Changes factorio into a rogue-like.",
 	"factorio_version": "2.0",
 	"dependencies": ["base", "space-age"]
 }
