@@ -122,16 +122,6 @@ local function init_space_platform()
 end
 
 local function init()
-	if game.tick ~= 0 then
-		--for player_name, player in pairs(game.players) do
-			--warning = player.gui.center.add{type = "frame", caption = "Warning"}
-			--warning.add{type = "label", caption = "Rouge engineer can only be used on new saves."}
-			--warning_button = warning.add{type = "button", caption = "Continue"}
-			--mod_active = false
-		--end
-		return
-	end
-
 	place_starting_entities(game.surfaces[1])
 	init_space_platform()
 

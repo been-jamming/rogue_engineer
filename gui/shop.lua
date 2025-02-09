@@ -44,6 +44,8 @@ function re_create_space_gui()
 		local player_name = player.name
 		space_gui[player_name] = {}
 		space_gui[player_name].frame = player.gui.center.add{type = "frame", caption = "Shop", direction = "vertical"}
+		space_gui[player_name].frame.style.natural_width = 500
+		space_gui[player_name].frame.style.natural_height = 500
 		space_gui[player_name].tabflow = space_gui[player_name].frame.add{type = "flow", direction = "horizontal"}
 		space_gui[player_name].production_tab = space_gui[player_name].tabflow.add{type = "tab", caption = "Production"}
 		space_gui[player_name].storage_tab = space_gui[player_name].tabflow.add{type = "tab", caption = "Storage"}
