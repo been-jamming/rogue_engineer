@@ -1,6 +1,6 @@
 --make the rocket take 30 minutes to craft
 --data.raw["rocket-silo"]["rocket-silo"].rocket_parts_required = 600
-data.raw["rocket-silo"]["rocket-silo"].rocket_parts_required = 10
+data.raw["rocket-silo"]["rocket-silo"].rocket_parts_required = 3
 --disable speed and productivity effects for the rocket silo
 data.raw["rocket-silo"]["rocket-silo"].allowed_effects = {"consumption", "pollution"}
 --make rocket silos require no power input
@@ -25,3 +25,9 @@ time_over_projectile.action.action_delivery.target_effects[3] = nil
 time_over_projectile.action.action_delivery.target_effects[4] = nil
 
 data:extend{time_over_projectile}
+
+data.raw["gui-style"].default["quality_style"] = {
+	type = "image_style",
+	left_padding = 16
+}
+

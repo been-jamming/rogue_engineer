@@ -14,7 +14,7 @@ local tick = 0
 local starting_tick = 0
 --local total_time = 60*60*30
 local total_time = 60*10
-local in_space = false
+in_space = false
 
 local function place_starting_entities(surface)
 	cargo = surface.create_entity{name = "cargo-landing-pad", position = {-20, 10}, force = "player"}
@@ -129,5 +129,5 @@ local function init()
 end
 
 script.on_init(init)
-script.on_event(defines.events.on_gui_click, re_click)
+script.on_event(defines.events.on_gui_click, re_gui_click)
 

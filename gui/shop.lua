@@ -1,41 +1,18 @@
 local space_gui = {}
 
-local function hide_top_flows(player_name)
-	space_gui[player_name].production_flow.visible = false
-	space_gui[player_name].storage_flow.visible = false
-	space_gui[player_name].planets_flow.visible = false
-end
-
-local function hide_planet_flows(player_name)
-	for planet_name, planet in pairs(game.planets) do
-		space_gui[player_name].planet_flow[planet_name].visible = false
-	end
-end
-
-function re_click(event)
+function re_gui_click(event)
 	if not in_space then return end
 
-	print(event.player_index)
 	local player_name = game.get_player(event.player_index).name
-	print(player_name)
+end
 
-	if event.element == space_gui[player_name].production_tab then
-		hide_top_flows(player_name)
-		space_gui[player_name].production_flow.visible = true
-	elseif event.element == space_gui[player_name].storage_tab then
-		hide_top_flows(player_name)
-		space_gui[player_name].storage_flow.visible = true
-	elseif event.element == space_gui[player_name].planets_tab then
-		hide_top_flows(player_name)
-		space_gui[player_name].planets_flow.visible = true
-	else
-		for planet_name, planet in pairs(game.planets) do
-			if event.element == space_gui[player_name].planet_tab[planet_name] then
-				hide_planet_flows(player_name)
-				space_gui[player_name].planet_flow[planet_name].visible = true
-				break
-			end
-		end
+function re_gui_closed(event)
+	if not in_space then return end
+
+	local player_name = game.get_player(event.player_index).name
+
+	if event.element == space_gui[player_name].frame then
+		space_gui[player_name].frame.visible = false
 	end
 end
 
@@ -44,46 +21,79 @@ function re_create_space_gui()
 		local player_name = player.name
 		space_gui[player_name] = {}
 		space_gui[player_name].frame = player.gui.center.add{type = "frame", caption = "Shop", direction = "vertical"}
-		space_gui[player_name].frame.style.natural_width = 500
-		space_gui[player_name].frame.style.natural_height = 500
-		space_gui[player_name].tabflow = space_gui[player_name].frame.add{type = "flow", direction = "horizontal"}
-		space_gui[player_name].production_tab = space_gui[player_name].tabflow.add{type = "tab", caption = "Production"}
-		space_gui[player_name].storage_tab = space_gui[player_name].tabflow.add{type = "tab", caption = "Storage"}
-		space_gui[player_name].planets_tab = space_gui[player_name].tabflow.add{type = "tab", caption = "Planets"}
-		space_gui[player_name].production_flow = space_gui[player_name].frame.add{type = "flow", direction = "vertical", visible = true}
-		space_gui[player_name].storage_flow = space_gui[player_name].frame.add{type = "flow", direction = "vertical", visible = false}
-		space_gui[player_name].planets_flow = space_gui[player_name].frame.add{type = "flow", direction = "vertical", visible = false}
-		space_gui[player_name].planets_tabflow = space_gui[player_name].planets_flow.add{type = "flow", direction = "horizontal"}
+		space_gui[player_name].frame.maximum_height = 750
+		space_gui[player_name].tab_pane = space_gui[player_name].frame.add{type = "tabbed-pane"}
+		space_gui[player_name].production_tab = space_gui[player_name].tab_pane.add{type = "tab", caption = "Production"}
+		space_gui[player_name].storage_tab = space_gui[player_name].tab_pane.add{type = "tab", caption = "Storage"}
+		space_gui[player_name].planets_tab = space_gui[player_name].tab_pane.add{type = "tab", caption = "Planets"}
+		space_gui[player_name].production_flow = space_gui[player_name].tab_pane.add{type = "flow", direction = "vertical"}
+		space_gui[player_name].production_search = space_gui[player_name].production_flow.add{type = "textfield"}
+		space_gui[player_name].production_table_label = space_gui[player_name].production_flow.add{type = "label", caption = "Production per second"}
+		space_gui[player_name].production_scroll = space_gui[player_name].production_flow.add{type = "scroll-pane"}
+		space_gui[player_name].production_table = space_gui[player_name].production_scroll.add{type = "table", column_count = 10}
+		space_gui[player_name].storage_flow = space_gui[player_name].tab_pane.add{type = "flow", direction = "vertical"}
+		space_gui[player_name].planets_tabpane = space_gui[player_name].tab_pane.add{type = "tabbed-pane"}
 		space_gui[player_name].planet_tab = {}
 		space_gui[player_name].planet_flow = {}
 		space_gui[player_name].planet_drop = {}
-		local index = 0
 		for planet_name, planet in pairs(game.planets) do
-			space_gui[player_name].planet_tab[planet_name] = space_gui[player_name]["planets_tabflow"].add{type = "tab", caption = "[space-location=" .. planet_name .. "]"}
-			space_gui[player_name].planet_flow[planet_name] = space_gui[player_name]["planets_flow"].add{type = "flow", direction = "vertical", visible = (index == 0)}
+			space_gui[player_name].planet_tab[planet_name] = space_gui[player_name].planets_tabpane.add{type = "tab", caption = "[space-location=" .. planet_name .. "]"}
+			space_gui[player_name].planet_flow[planet_name] = space_gui[player_name].planets_tabpane.add{type = "flow", direction = "vertical"}
 			space_gui[player_name].planet_flow[planet_name].add{type = "label", caption = "[color=1,0,0]This is some info about the planet" .. planet_name .. ".[/color]"}
-			space_gui[player_name].planet_drop[planet_name] = space_gui[player_name]["planet_flow"][planet_name].add{type = "button", caption = "Drop here"}
-			index = index + 1
+			space_gui[player_name].planet_drop[planet_name] = space_gui[player_name].planet_flow[planet_name].add{type = "button", caption = "Drop here"}
+			space_gui[player_name].planets_tabpane.add_tab(space_gui[player_name].planet_tab[planet_name], space_gui[player_name].planet_flow[planet_name])
 		end
 		space_gui[player_name].storage_flow.add{type = "label", caption = "[color=0,0,1]Some info about storage[/color]"}
+
+		space_gui[player_name].tab_pane.add_tab(space_gui[player_name].production_tab, space_gui[player_name].production_flow)
+		space_gui[player_name].tab_pane.add_tab(space_gui[player_name].storage_tab, space_gui[player_name].storage_flow)
+		space_gui[player_name].tab_pane.add_tab(space_gui[player_name].planets_tab, space_gui[player_name].planets_tabpane)
+	end
+end
+
+local function rate_string(rate)
+	local per_sec = rate*60
+	if per_sec < 10 then
+		return string.format("%.1f", rate*60)
+	elseif per_sec >= 10 and per_sec < 1000 then
+		return tostring(math.floor(rate*60))
+	elseif per_sec >= 1000 and per_sec < 1000000 then
+		return tostring(math.floor(rate*60/1000))
+	elseif per_sec >= 1000000 then
+		return tostring(math.floor(rate*60/1000000))
+	else
+		return "0"
 	end
 end
 
 local function generate_production_gui(player_name, item_production)
-	if not space_gui[player_name].production_elements then
-		space_gui[player_name].production_elements = {}
+	local search_text = space_gui[player_name].production_search.text
+
+	if not space_gui[player_name].production_elements_item then
+		space_gui[player_name].production_elements_item = {}
+		space_gui[player_name].production_elements_quality = {}
+		space_gui[player_name].production_elements_count = {}
 	end
 
 	for item_name, amounts in pairs(item_production) do
-		if not space_gui[player_name].production_elements[item_name] then
-			space_gui[player_name].production_elements[item_name] = {}
+		if not space_gui[player_name].production_elements_item[item_name] then
+			space_gui[player_name].production_elements_item[item_name] = {}
+			space_gui[player_name].production_elements_quality[item_name] = {}
+			space_gui[player_name].production_elements_count[item_name] = {}
 		end
 
 		for quality, amount in pairs(amounts) do
-			if not space_gui[player_name].production_elements[item_name][quality] then
-				space_gui[player_name].production_elements[item_name][quality] = space_gui[player_name].production_flow.add{type = "label"}
+			if not space_gui[player_name].production_elements_item[item_name][quality] then
+				space_gui[player_name].production_elements_item[item_name][quality] = space_gui[player_name].production_table.add{type = "sprite-button", sprite = "item/" .. item_name}
+				if quality ~= "normal" then
+					space_gui[player_name].production_elements_quality[item_name][quality] = space_gui[player_name].production_elements_item[item_name][quality].add{type = "sprite", sprite = "quality/" .. quality, style = "quality_style"}
+				end
+				space_gui[player_name].production_elements_count[item_name][quality] = space_gui[player_name].production_elements_item[item_name][quality].add{type = "label"}
+				space_gui[player_name].production_elements_count[item_name][quality].style.font = "default-semibold"
+				space_gui[player_name].production_elements_count[item_name][quality].style.top_padding = 16
 			end
-			space_gui[player_name].production_elements[item_name][quality].caption = "[item=" .. item_name .. ",quality=" .. quality .. "] " .. tostring(amount*60.0) .. "/s"
+			space_gui[player_name].production_elements_count[item_name][quality].caption = rate_string(amount) 
+			space_gui[player_name].production_elements_item[item_name][quality].visible = ((string.find(item_name, search_text) ~= nil or string.find(quality, search_text) ~= nil) and amount > 0)
 		end
 
 	end
